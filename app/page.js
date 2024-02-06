@@ -1,3 +1,5 @@
+// page.js
+
 'use client';
 import { useState } from 'react';
 import axios from 'axios';
@@ -10,23 +12,21 @@ export default function Home() {
   const handleSubmit = async () => {
     console.log(text);
 
-    if (text === '') {
-      return alert('Please enter a valid json structure');
+    if (text.trim() === '') {
+      return alert('Please enter a valid procedure name');
     }
 
-    let jsonised;
-    try {
-      jsonised = JSON.parse(text);
-    } catch (err) {
-      return alert('Not a valid json structure');
-    }
+    const dataToSend = {
+      text: text,
+      top_n: 5 // or any other number you wish to specify
+    };
 
     setSnomedResponse(null);
 
     try {
       setFetching(true);
 
-      const res = await axios.post(process.env.NEXT_PUBLIC_API_URL, jsonised, {
+      const res = await axios.post(process.env.NEXT_PUBLIC_API_URL, dataToSend, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -47,16 +47,17 @@ export default function Home() {
     <main className='flex min-h-screen flex-col items-center justify-between p-24'>
       <div className='z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex'>
         <p className='fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30'>
-          myBRO Demo
+          Malaysian Bot Record Optimizer (MyBRO) Demo
         </p>
       </div>
 
-      <div className='flex flex-col items-center'>
-        Diagnosis:{' '}
+      <div className='w-full max-w-5xl mb-8'>
+        <label htmlFor="procedureInput" className="mb-2 text-lg">Procedure:</label>
         <textarea
+          id="procedureInput"
           className='w-full h-40 p-4 border-2 text-black border-gray-300 rounded-lg dark:border-neutral-800'
           value={text}
-          placeholder='Enter your symptoms here'
+          placeholder='Enter procedure name here'
           onChange={(e) => setText(e.target.value)}
         ></textarea>
         <button
@@ -69,40 +70,23 @@ export default function Home() {
         </button>
       </div>
 
-      <div className='mt-5 mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:text-left'>
-        <div className='group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30'>
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            JSON Response{' '}
-            <span className='inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none'>
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 text-sm opacity-50`}>
-            {snomedResponse
-              ? JSON.stringify(snomedResponse, null, 2)
-              : 'Waiting for response'}
-          </p>
-        </div>
-
-        <div className='group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30'>
-          <h2 className={`mb-3 text-2xl font-semibold`}>
+      <div className='w-full max-w-5xl'>
+        <div className='rounded-lg border border-transparent px-5 py-4 transition-colors'>
+          <h2 className={`text-2xl font-semibold mb-4`}>
             Table{' '}
-            <span className='inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none'>
-              -&gt;
-            </span>
           </h2>
           <div className='overflow-x-auto'>
             {snomedResponse ? (
-              <table className='min-w-full divide-y divide-gray-200 shadow-sm'>
+              <table className='w-full table-fixed divide-y divide-gray-200 shadow-sm'>
                 <thead className='bg-gray-50'>
                   <tr>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Code
                     </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Description
                     </th>
-                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Score
                     </th>
                   </tr>
@@ -110,13 +94,13 @@ export default function Home() {
                 <tbody className='bg-white divide-y divide-gray-200'>
                   {snomedResponse[0].predictions.map((item, index) => (
                     <tr key={index}>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-blue-600 hover:underline'>
+                      <td className='px-3 py-2 whitespace-nowrap text-sm text-gray-500'>
                         {item.code}
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                      <td className='px-3 py-2 text-sm text-gray-500'>
                         {item.description}
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                      <td className='px-3 py-2 whitespace-nowrap text-sm text-gray-500'>
                         {item.score}
                       </td>
                     </tr>
