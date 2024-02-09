@@ -17,8 +17,9 @@ bun install
 Add a `.env` file in the root of the project with the following content:
 
 ```env
-NEXT_PUBLIC_API_URL=your_snomed_api_url
-NEXT_PUBLIC_API_KEY=your_snomed_api_key
+SNOMED_API_URL = your_snomed_api_url
+ICD10_API_URL = your_icd10_api_url
+API_KEY = your_api_key
 ```
 
 Then, run the development server:
