@@ -4,6 +4,18 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+const SelectionButton = ({ apiSelection, setApiSelection, value }) => (
+  <button
+    className={`p-2 w-full ${
+      apiSelection === value ? 'bg-blue-500 text-white' : 'bg-black text-white'
+    }`}
+    onClick={() => setApiSelection(value)}
+    aria-label={`Select ${value}`}
+  >
+    {value}
+  </button>
+);
+
 export default function Home() {
   const [text, setText] = useState('');
   const [snomedResponse, setSnomedResponse] = useState(null);
@@ -55,29 +67,21 @@ export default function Home() {
         </p>
       </div>
 
-      <div className='w-full max-w-5xl mb-8'>
-        <div className='flex justify-center mb-4 items-center'>
+      <div className='w-full max-w-5xl mb-2'>
+        <div className='flex flex-col md:flex-row justify-center mb-4 items-center'>
           {/* SNOMEDCT and ICD10 buttons */}
-          <button
-            className={`mx-2 p-2 ${
-              apiSelection === 'SNOMEDCT'
-                ? 'bg-blue-500 text-white'
-                : 'bg-black text-white'
-            }`}
-            onClick={() => setApiSelection('SNOMEDCT')}
-          >
-            SNOMEDCT
-          </button>
-          <button
-            className={`mx-2 p-2 ${
-              apiSelection === 'ICD10'
-                ? 'bg-blue-500 text-white'
-                : 'bg-black text-white'
-            }`}
-            onClick={() => setApiSelection('ICD10')}
-          >
-            ICD10
-          </button>
+          <div className='border-2 border-gray-300 rounded-lg inline-flex p-2'>
+            <SelectionButton
+              apiSelection={apiSelection}
+              setApiSelection={setApiSelection}
+              value='SNOMEDCT'
+            />
+            <SelectionButton
+              apiSelection={apiSelection}
+              setApiSelection={setApiSelection}
+              value='ICD10'
+            />
+          </div>
 
           {/* Spacer */}
           <div className='w-8'></div>
@@ -106,21 +110,31 @@ export default function Home() {
 
         <label htmlFor='procedureInput' className='mb-2 text-lg'>
           {apiSelection === 'SNOMEDCT' ? 'Procedure:' : 'Diagnosis:'}
+          <textarea
+            id='procedureInput'
+            className='w-full h-40 p-4 border-2 text-black border-gray-300 rounded-lg dark:border-neutral-800'
+            value={text}
+            placeholder={
+              apiSelection === 'SNOMEDCT'
+                ? 'Enter procedure name here'
+                : 'Enter your diagnosis here'
+            }
+            onChange={(e) => setText(e.target.value)}
+            aria-label={
+              apiSelection === 'SNOMEDCT'
+                ? 'Procedure input'
+                : 'Diagnosis input'
+            }
+          />
         </label>
-        <textarea
-          id='procedureInput'
-          className='w-full h-40 p-4 border-2 text-black border-gray-300 rounded-lg dark:border-neutral-800'
-          value={text}
-          placeholder={
-            apiSelection === 'SNOMEDCT'
-              ? 'Enter procedure name here'
-              : 'Enter your diagnosis here'
-          }
-          onChange={(e) => setText(e.target.value)}
-        ></textarea>
+
         <button
           type='button'
-          className='mt-2 p-2 text-white rounded-lg border border-1 border-black dark:border-white hover:bg-grey-200 dark:hover:bg-grey-800'
+          className={`mt-2 p-2 text-white rounded-lg border border-1 border-black dark:border-white ${
+            fetching
+              ? 'bg-gray-500 animate-pulse cursor-not-allowed'
+              : 'hover:bg-grey-200 dark:hover:bg-grey-800'
+          }`}
           onClick={handleSubmit}
           disabled={fetching}
         >
