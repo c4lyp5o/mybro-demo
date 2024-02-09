@@ -1,6 +1,10 @@
+import axios from 'axios';
+
 export async function POST(request) {
   try {
-    const { text, top_n } = request.body;
+    const body = await request.json();
+
+    const { text, top_n } = body;
 
     if (!text) {
       return Response.json(
@@ -9,24 +13,24 @@ export async function POST(request) {
       );
     }
 
-    const response = await axios.post(
-      process.env.ICD10_API_URL,
-      {
-        procedure: text,
-        top_n: top_n,
-      },
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.API_KEY,
-        },
-      }
-    );
+    const query = {
+      text: text,
+      top_n: top_n,
+    };
 
-    return Response.json(response);
+    const headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.API_KEY,
+    };
+
+    const response = await axios.post(process.env.ICD10_API_URL, query, {
+      headers,
+    });
+
+    return Response.json(response.data);
   } catch (error) {
-    console.error(error);
-    return Response.json({ message: 'Failed to login' }, { status: 500 });
+    console.log(error);
+    return Response.json({ message: 'Failed to query' }, { status: 500 });
   }
 }
