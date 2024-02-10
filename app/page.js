@@ -34,20 +34,16 @@ export default function Home() {
       );
     }
 
-    const apiUrl =
-      apiSelection === 'SNOMEDCT' ? '/api/v1/snomed' : '/api/v1/icd10';
-
-    const dataToSend = {
-      text: text,
-      top_n: topN,
-    };
-
     setSnomedResponse(null);
+
+    const encodedText = encodeURIComponent(text);
 
     try {
       setFetching(true);
 
-      const res = await axios.post(apiUrl, dataToSend);
+      const res = await axios.get(
+        `/api/v1/mybro?type=${apiSelection}&text=${encodedText}&top_n=${topN}`
+      );
 
       console.log(res.data);
       setSnomedResponse(res.data);
